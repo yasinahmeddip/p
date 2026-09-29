@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eyasin Ahmed Dipu | IT Specialist & Web Developer</title>
+  
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Rajdhani:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  
+  <!-- GSAP & ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #04090c;
+      --bg-alt: #081318;
+      --neon-cyan: #00ffc8;
+      --neon-teal: #0891b2;
+      --accent-red: #ff3344;
+      --text-main: #f0fdfa;
+      --text-muted: #94a3b8;
+      --border-glow: rgba(0, 255, 200, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Ambient Storm Canvas in Background */
+    #storm-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.65;
+    }
+
+    /* Fog Overlay */
+    .fog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 30%, rgba(0, 255, 200, 0.08), transparent 70%),
+                  radial-gradient(circle at 80% 80%, rgba(8, 145, 178, 0.08), transparent 60%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Top Navigation Bar */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background: rgba(4, 9, 12, 0.7);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0, 255, 200, 0.15);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Cinzel', serif;
+      font-size: 20px;
+      letter-spacing: 2px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .brand-logo i {
+      color: var(--neon-cyan);
+      filter: drop-shadow(0 0 10px var(--neon-cyan));
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .lang-btn, .audio-toggle-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glow);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .lang-btn:hover, .audio-toggle-btn:hover {
+      background: var(--neon-cyan);
+      color: #000;
+      box-shadow: 0 0 18px var(--neon-cyan);
+    }
+
+    .active-audio {
+      border-color: var(--accent-red);
+      color: var(--accent-red);
+      animation: pulse-red 1.8s infinite;
+    }
+
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 8px rgba(255, 51, 68, 0.4); }
+      50% { box-shadow: 0 0 22px rgba(255, 51, 68, 0.9); }
+    }
+
+    /* SECTION CONTAINERS */
+    section {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 100px 30px;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    /* 1. INTRO GATE OVERLAY */
+    #gatekeeper-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(4, 9, 12, 0.96);
+      backdrop-filter: blur(25px);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .gate-circle-loader {
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top: 4px solid var(--accent-red);
+      border-right: 4px solid var(--neon-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: spin-glow 3s linear infinite;
+      box-shadow: 0 0 45px rgba(255, 51, 68, 0.35);
+      margin-bottom: 30px;
+    }
+
+    @keyframes spin-glow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .gate-number {
+      position: absolute;
+      font-family: 'Cinzel', serif;
+      font-size: 42px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+    }
+
+    .gate-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(24px, 4vw, 42px);
+      letter-spacing: 4px;
+      margin-bottom: 12px;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .gate-sub {
+      color: var(--text-muted);
+      font-size: 17px;
+      max-width: 500px;
+      margin-bottom: 35px;
+    }
+
+    .gate-btn {
+      background: linear-gradient(135deg, #ff2a4b, #b91c1c);
+      color: #fff;
+      border: none;
+      padding: 16px 42px;
+      border-radius: 50px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.35s ease;
+      box-shadow: 0 0 30px rgba(255, 42, 75, 0.6);
+      text-transform: uppercase;
+    }
+
+    .gate-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 50px rgba(255, 42, 75, 0.9);
+      background: linear-gradient(135deg, #ff4767, #dc2626);
+    }
+
+    /* 2. HERO SHOWCASE SECTION */
+    .hero-container {
+      text-align: center;
+      position: relative;
+      width: 100%;
+    }
+
+    .portrait-stage {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      margin: 0 auto 30px;
+    }
+
+    .portrait-aura {
+      position: absolute;
+      top: -15px;
+      left: -15px;
+      right: -15px;
+      bottom: -15px;
+      border-radius: 50%;
+      background: conic-gradient(from 180deg at 50% 50%, var(--neon-cyan) 0deg, var(--neon-teal) 140deg, var(--accent-red) 280deg, var(--neon-cyan) 360deg);
+      filter: blur(28px);
+      opacity: 0.65;
+      animation: rotate-aura 10s linear infinite;
+    }
+
+    @keyframes rotate-aura {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .portrait-img-box {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 3px solid rgba(0, 255, 200, 0.6);
+      box-shadow: 0 0 40px rgba(0, 255, 200, 0.4);
+      background: #0b171f;
+    }
+
+    .portrait-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      filter: contrast(1.1) brightness(1.05);
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 6px 18px;
+      border-radius: 30px;
+      background: rgba(0, 255, 200, 0.1);
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(38px, 6vw, 75px);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 35px rgba(0, 255, 200, 0.35);
+    }
+
+    .hero-title span {
+      color: var(--neon-cyan);
+      display: inline-block;
+    }
+
+    .hero-subtitle {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: clamp(18px, 2.5vw, 26px);
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: #cbd5e1;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+    }
+
+    .hero-desc {
+      max-width: 780px;
+      margin: 0 auto 35px;
+      font-size: 18px;
+      color: var(--text-muted);
+    }
+
+    .hero-cta-group {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--neon-cyan), #0284c7);
+      color: #021217;
+      font-weight: 700;
+      padding: 14px 34px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 17px;
+      letter-spacing: 1.5px;
+      transition: all 0.3s;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 25px rgba(0, 255, 200, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 40px rgba(0, 255, 200, 0.7);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--neon-cyan);
+      color: var(--neon-cyan);
+      font-weight: 700;
+      padding: 14px 34px;
+      border-radius: 40px;
+      text-decoration: none;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 17px;
+      letter-spacing: 1.5px;
+      transition: all 0.3s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-outline:hover {
+      background: rgba(0, 255, 200, 0.12);
+      transform: translateY(-3px);
+      box-shadow: 0 0 25px rgba(0, 255, 200, 0.3);
+    }
+
+    /* 3. SECTION HEADINGS */
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+      width: 100%;
+    }
+
+    .section-tag {
+      color: var(--accent-red);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(30px, 4vw, 48px);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 2px;
+    }
+
+    .section-title span {
+      color: var(--neon-cyan);
+    }
+
+    /* 4. SCATTERED / FLOATING CARD SHOWCASE (Like the video) */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+      width: 100%;
+    }
+
+    .skill-card {
+      background: rgba(11, 23, 31, 0.75);
+      border: 1px solid rgba(0, 255, 200, 0.15);
+      padding: 30px;
+      border-radius: 20px;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+
+    .skill-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--neon-cyan);
+      box-shadow: 0 15px 35px rgba(0, 255, 200, 0.2);
+    }
+
+    .skill-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--neon-cyan);
+    }
+
+    .card-icon {
+      font-size: 34px;
+      color: var(--neon-cyan);
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+
+    .card-body {
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .tag-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .pill {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0, 255, 200, 0.2);
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 600;
+    }
+
+    /* 5. INTERACTIVE "ASK THE IT SPECIALIST" RADAR / TERMINAL (Similar to "Ask the Baba") */
+    .ask-terminal-container {
+      width: 100%;
+      background: radial-gradient(circle at center, rgba(8, 28, 36, 0.85) 0%, rgba(4, 9, 12, 0.95) 100%);
+      border: 1px solid var(--border-glow);
+      border-radius: 30px;
+      padding: 50px 30px;
+      position: relative;
+      box-shadow: 0 0 50px rgba(0, 255, 200, 0.1);
+    }
+
+    .radar-circle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 500px;
+      border: 1px dashed rgba(0, 255, 200, 0.15);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: rotate-radar 20s linear infinite;
+    }
+
+    @keyframes rotate-radar {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .ask-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      position: relative;
+      z-index: 5;
+    }
+
+    @media (max-width: 900px) {
+      .ask-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .questions-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .ask-btn {
+      background: rgba(11, 23, 31, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px 20px;
+      border-radius: 12px;
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .ask-btn i.play-badge {
+      color: var(--accent-red);
+      font-size: 14px;
+      transition: transform 0.3s;
+    }
+
+    .ask-btn:hover, .ask-btn.active {
+      border-color: var(--neon-cyan);
+      background: rgba(0, 255, 200, 0.08);
+      transform: translateX(8px);
+      box-shadow: 0 0 20px rgba(0, 255, 200, 0.2);
+    }
+
+    .ask-btn.active i.play-badge {
+      color: var(--neon-cyan);
+      transform: scale(1.3);
+    }
+
+    .answer-console {
+      background: #02070a;
+      border: 1px solid rgba(0, 255, 200, 0.3);
+      border-radius: 16px;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 340px;
+      box-shadow: inset 0 0 30px rgba(0, 255, 200, 0.05);
+      position: relative;
+    }
+
+    .console-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 15px;
+    }
+
+    .console-lights {
+      display: flex;
+      gap: 6px;
+    }
+
+    .light {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .light.red { background: #ef4444; }
+    .light.yellow { background: #f59e0b; }
+    .light.green { background: #10b981; }
+
+    .console-status {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      color: var(--neon-cyan);
+      letter-spacing: 1px;
+    }
+
+    .console-content {
+      margin: 20px 0;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #e2e8f0;
+      min-height: 140px;
+    }
+
+    .audio-wave {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 25px;
+    }
+
+    .bar-line {
+      width: 3px;
+      height: 100%;
+      background: var(--neon-cyan);
+      border-radius: 3px;
+      animation: sound-bounce 1s ease-in-out infinite alternate;
+    }
+
+    .bar-line:nth-child(2) { animation-delay: 0.15s; height: 60%; }
+    .bar-line:nth-child(3) { animation-delay: 0.3s; height: 90%; }
+    .bar-line:nth-child(4) { animation-delay: 0.45s; height: 40%; }
+    .bar-line:nth-child(5) { animation-delay: 0.6s; height: 75%; }
+
+    @keyframes sound-bounce {
+      0% { transform: scaleY(0.2); }
+      100% { transform: scaleY(1); }
+    }
+
+    /* 6. TIMELINE & EXPERIENCE */
+    .timeline-container {
+      width: 100%;
+      max-width: 900px;
+      position: relative;
+    }
+
+    .timeline-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20px;
+      height: 100%;
+      width: 2px;
+      background: linear-gradient(to bottom, var(--neon-cyan), var(--neon-teal), transparent);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-left: 55px;
+      margin-bottom: 40px;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      top: 5px;
+      left: 11px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--bg-dark);
+      border: 3px solid var(--neon-cyan);
+      box-shadow: 0 0 12px var(--neon-cyan);
+    }
+
+    .timeline-time {
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      font-size: 15px;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    .timeline-role {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .timeline-company {
+      color: var(--text-muted);
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    .timeline-desc {
+      color: #cbd5e1;
+      font-size: 15px;
+    }
+
+    /* 7. FOOTER & CONTACT */
+    footer {
+      position: relative;
+      z-index: 10;
+      background: #020608;
+      border-top: 1px solid rgba(0, 255, 200, 0.15);
+      padding: 60px 40px 30px;
+      text-align: center;
+    }
+
+    .contact-card-grid {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+
+    .contact-item-box {
+      background: rgba(11, 23, 31, 0.7);
+      border: 1px solid rgba(0, 255, 200, 0.2);
+      padding: 18px 28px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #fff;
+      text-decoration: none;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .contact-item-box i {
+      color: var(--neon-cyan);
+      font-size: 20px;
+    }
+
+    .contact-item-box:hover {
+      border-color: var(--neon-cyan);
+      transform: translateY(-3px);
+      box-shadow: 0 0 25px rgba(0, 255, 200, 0.3);
+    }
+
+    .footer-copy {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 30px;
+    }
+
+    /* Responsiveness */
+    @media (max-width: 768px) {
+      header { padding: 15px 20px; }
+      .portrait-stage { width: 230px; height: 230px; }
+      .brand-logo span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Storm Canvas Layer -->
+  <canvas id="storm-canvas"></canvas>
+  <div class="fog-overlay"></div>
+
+  <!-- 1. CINEMATIC GATEWAY MODAL (Replicating "Turn on the sound / Digital Dropouts" loader) -->
+  <div id="gatekeeper-modal">
+    <div class="gate-circle-loader">
+      <div class="gate-number">100%</div>
+    </div>
+    <h1 class="gate-title">EYASIN AHMED DIPU</h1>
+    <p class="gate-sub" id="gate-sub-text">
+      The terminal awaits you. Turn on the sound to experience the interactive portfolio.
+    </p>
+    <button class="gate-btn" id="enter-portal-btn">
+      <i class="fa-solid fa-volume-high"></i> <span id="enter-btn-text">ENTER EXPERIENCE</span>
+    </button>
+  </div>
+
+  <!-- Header Navigation -->
+  <header>
+    <div class="brand-logo">
+      <i class="fa-solid fa-bolt-lightning"></i>
+      <span>DIPU // IT.SYSTEMS</span>
+    </div>
+    <div class="nav-actions">
+      <button class="lang-btn" id="lang-toggle-btn" title="Cambia Lingua / Switch Language">
+        <i class="fa-solid fa-globe"></i> <span id="lang-indicator">IT</span>
+      </button>
+      <button class="audio-toggle-btn" id="audio-toggle-btn" title="Toggle Sound">
+        <i class="fa-solid fa-volume-high"></i> <span id="audio-status-label">AUDIO: ON</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. HERO SECTION -->
+  <section id="hero">
+    <div class="hero-container">
+      <div class="portrait-stage">
+        <div class="portrait-aura"></div>
+        <div class="portrait-img-box">
+          <!-- Using the provided avatar/photo from the CV -->
+          <img src="Eyasin Ahmed dipu Cv.pdf" alt="Eyasin Ahmed Dipu - IT Specialist" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80';" />
+        </div>
+      </div>
+
+      <div class="hero-badge" id="hero-badge-text">
+        <i class="fa-solid fa-satellite-dish"></i> CAGLIARI, SARDEGNA, ITALY
+      </div>
+
+      <h1 class="hero-title">
+        EYASIN AHMED <span>DIPU</span>
+      </h1>
+
+      <h2 class="hero-subtitle" id="hero-role-title">
+        IT TECHNICIAN | NETWORKING & CCTV | WEB DEV
+      </h2>
+
+      <p class="hero-desc" id="hero-profile-text">
+        IT Support Technician with hands-on experience in hardware/software diagnostics, network infrastructure, CCTV systems, and modern web interfaces. Ready to contribute with precision in mission-critical environments.
+      </p>
+
+      <div class="hero-cta-group">
+        <a href="#ask-section" class="btn-primary" id="ask-dipu-btn">
+          <i class="fa-solid fa-terminal"></i> <span id="cta-ask-text">INTERROGA IL TERMINALE</span>
+        </a>
+        <a href="#experience" class="btn-outline">
+          <i class="fa-solid fa-network-wired"></i> <span id="cta-exp-text">ESPERIENZA & SKILLS</span>
+        </a>
+        <a href="mailto:eyasinitaly@gmail.com" class="btn-outline">
+          <i class="fa-solid fa-envelope"></i> <span>CONTATTA</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. INTERACTIVE "ASK DIPU" (Like "Ask the Baba" from the video) -->
+  <section id="ask-section">
+    <div class="section-header">
+      <span class="section-tag" id="ask-tag">INTERACTIVE TERMINAL</span>
+      <h2 class="section-title">ASK <span>THE SPECIALIST</span></h2>
+      <p style="color: var(--text-muted); margin-top: 10px;" id="ask-sub">Click any question below — hear Dipu's synthesized voice & insights instantly.</p>
+    </div>
+
+    <div class="ask-terminal-container">
+      <div class="radar-circle"></div>
+
+      <div class="ask-layout">
+        <!-- Interactive Question Buttons -->
+        <div class="questions-stack" id="questions-container">
+          <!-- Rendered dynamically based on language -->
+        </div>
+
+        <!-- Dynamic Answer Console Screen -->
+        <div class="answer-console">
+          <div class="console-header">
+            <div class="console-lights">
+              <div class="light red"></div>
+              <div class="light yellow"></div>
+              <div class="light green"></div>
+            </div>
+            <div class="console-status" id="console-query-status">SYSTEM READY // IDLE</div>
+          </div>
+
+          <div class="console-content" id="console-display">
+            Select a question from the radar on the left to transmit query into the IT core terminal.
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+            <div class="audio-wave" id="audio-wave-anim">
+              <div class="bar-line"></div>
+              <div class="bar-line"></div>
+              <div class="bar-line"></div>
+              <div class="bar-line"></div>
+              <div class="bar-line"></div>
+            </div>
+            <span style="font-size: 13px; color: var(--neon-cyan); font-family: 'Rajdhani', sans-serif;">VOICE RESPONSE ENGINE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. SKILLS & COMPETENZE (Scattered cards aesthetic) -->
+  <section id="skills">
+    <div class="section-header">
+      <span class="section-tag">COMPETENZE TECNICHE</span>
+      <h2 class="section-title">CORE <span>ARSENAL</span></h2>
+    </div>
+
+    <div class="skills-grid">
+      <div class="skill-card">
+        <div class="card-icon"><i class="fa-solid fa-server"></i></div>
+        <h3 class="card-title">IT Support & Diagnostics</h3>
+        <p class="card-body">Hardware/Software repair, user troubleshooting, operating systems (Windows OS & Office 365), and maintenance of critical workstations.</p>
+        <div class="tag-pills">
+          <span class="pill">Hardware Repair</span>
+          <span class="pill">Office 365</span>
+          <span class="pill">Troubleshooting</span>
+          <span class="pill">CompTIA A+</span>
+        </div>
+      </div>
+
+      <div class="skill-card">
+        <div class="card-icon"><i class="fa-solid fa-network-wired"></i></div>
+        <h3 class="card-title">Networking & Fiber Optics</h3>
+        <p class="card-body">Configuring LAN/WAN switches, routers, IP addressing, basic fiber optic installation and network link diagnostics.</p>
+        <div class="tag-pills">
+          <span class="pill">LAN / WAN</span>
+          <span class="pill">Cisco CCNA</span>
+          <span class="pill">Fiber Optic</span>
+          <span class="pill">Switching</span>
+        </div>
+      </div>
+
+      <div class="skill-card">
+        <div class="card-icon"><i class="fa-solid fa-video"></i></div>
+        <h3 class="card-title">CCTV & Surveillance</h3>
+        <p class="card-body">Full deployment, maintenance, cabling, and remote access configuration for commercial and private CCTV video surveillance systems.</p>
+        <div class="tag-pills">
+          <span class="pill">DVR / NVR</span>
+          <span class="pill">IP Cameras</span>
+          <span class="pill">Maintenance</span>
+        </div>
+      </div>
+
+      <div class="skill-card">
+        <div class="card-icon"><i class="fa-solid fa-code"></i></div>
+        <h3 class="card-title">Web Development</h3>
+        <p class="card-body">Creating responsive, clean, and interactive websites using HTML5, modern CSS3, Bootstrap, and WordPress deployment.</p>
+        <div class="tag-pills">
+          <span class="pill">HTML5 & CSS3</span>
+          <span class="pill">Bootstrap</span>
+          <span class="pill">WordPress</span>
+          <span class="pill">Full Stack Cert</span>
+        </div>
+      </div>
+
+      <div class="skill-card">
+        <div class="card-icon"><i class="fa-solid fa-certificate"></i></div>
+        <h3 class="card-title">Accredited Certifications</h3>
+        <p class="card-body">Internationally validated technical acumen across network architectures, computer systems, and full-stack software.</p>
+        <div class="tag-pills">
+          <span class="pill">CompTIA A+</span>
+          <span class="pill">Cisco CCNA</span>
+          <span class="pill">Full Stack Dev</span>
+        </div>
+      </div>
+
+      <div class="skill-card">
+        <div class="card-icon"><i class="fa-solid fa-language"></i></div>
+        <h3 class="card-title">Languages & Mobility</h3>
+        <p class="card-body">Multilingual adaptability in international fast-paced settings. Italian (A2 Working Base), English (B2 Intermediate), Bengali (Native).</p>
+        <div class="tag-pills">
+          <span class="pill">Italian A2</span>
+          <span class="pill">English B2</span>
+          <span class="pill">Bengali Native</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. WORK EXPERIENCE TIMELINE -->
+  <section id="experience">
+    <div class="section-header">
+      <span class="section-tag">TRACK RECORD</span>
+      <h2 class="section-title">WORK <span>EXPERIENCE</span></h2>
+    </div>
+
+    <div class="timeline-container">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">MAGGIO 2026 – PRESENTE (CAGLIARI)</div>
+        <div class="timeline-role">Cameriere & Assistente Bar</div>
+        <div class="timeline-company">Art Of Sushi Cagliari</div>
+        <p class="timeline-desc">Customer engagement, fast workflow management, dynamic collaboration in a high-speed hospitality environment in Sardinia, Italy.</p>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">2023 – 2025</div>
+        <div class="timeline-role">Tecnico IT</div>
+        <div class="timeline-company">Big Boss</div>
+        <p class="timeline-desc">Maintenance of corporate computer systems, CCTV network, troubleshooting hardware/software and user connectivity issues on-site.</p>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">2019 – 2022</div>
+        <div class="timeline-role">Quality Assurance Executive</div>
+        <div class="timeline-company">Tekarsh LLC</div>
+        <p class="timeline-desc">Maintained structured records, project documentation, international client coordination, and systematic efficiency optimization.</p>
+      </div>
+
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-time">STAGE 2019</div>
+        <div class="timeline-role">Assistente Tecnico (Stage)</div>
+        <div class="timeline-company">Bismillah Telecom Service (BTS)</div>
+        <p class="timeline-desc">Assisted in fiber optic cabling, testing, splicing, and hands-on networking troubleshooting.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. FOOTER & CONTACT CHANNELS -->
+  <footer>
+    <h2 style="font-family: 'Cinzel', serif; font-size: 32px; margin-bottom: 20px;">READY TO CONNECT?</h2>
+    
+    <div class="contact-card-grid">
+      <a href="tel:+393500946931" class="contact-item-box">
+        <i class="fa-solid fa-phone"></i> +39 3500 946931
+      </a>
+      <a href="mailto:eyasinitaly@gmail.com" class="contact-item-box">
+        <i class="fa-solid fa-envelope"></i> eyasinitaly@gmail.com
+      </a>
+      <a href="https://linkedin.com/in/eyasin-ahmed" target="_blank" class="contact-item-box">
+        <i class="fa-brands fa-linkedin"></i> LinkedIn Profile
+      </a>
+      <a href="https://github.com/yasinahmeddip" target="_blank" class="contact-item-box">
+        <i class="fa-brands fa-github"></i> GitHub Repo
+      </a>
+    </div>
+
+    <p style="color: var(--neon-cyan); font-family: 'Rajdhani', sans-serif; font-size: 16px;">
+      <i class="fa-solid fa-location-dot"></i> Cagliari, Sardegna, Italy
+    </p>
+
+    <p class="footer-copy">
+      © 2026 Eyasin Ahmed Dipu. Built with modern cinematic web standards, GSAP & Web Audio API.
+    </p>
+  </footer>
+
+  <!-- SCRIPT LOGIC (Audio Engine, Canvas Storm, GSAP & Multilingual Content) -->
+  <script>
+    // -------------------------------------------------------------
+    // MULTILINGUAL DATABASE (English & Italian based on your CV)
+    // -------------------------------------------------------------
+    let currentLang = 'IT'; // 'IT' or 'EN'
+    let soundEnabled = true;
+
+    const dataCV = {
+      IT: {
+        gateSub: "Il terminale ti aspetta. Attiva l'audio per un'esperienza interattiva.",
+        enterBtn: "ENTRA NEL TERMINALE",
+        badge: "CAGLIARI, SARDEGNA, ITALIA",
+        role: "TECNICO IT | NETWORKING | CCTV & SVILUPPO WEB",
+        profile: "Tecnico di supporto IT con esperienza pratica nella risoluzione di problemi hardware e software, networking, sistemi CCTV e sviluppo web. Pronto a contribuire in ambienti professionali e dinamici in Italia.",
+        askTitle: "INTERROGA IL TERMINALE",
+        askSub: "Fai clic su una domanda: il sintetizzatore vocale ti risponderà con i dettagli del mio profilo.",
+        questions: [
+          {
+            q: "Qual è la tua esperienza principale?",
+            a: "Ho lavorato come Tecnico IT per Big Boss e Tekarsh LLC, gestendo configurazioni di rete LAN/WAN, diagnostica hardware/software e sistemi di videosorveglianza CCTV.",
+            voice: "Ho esperienza come Tecnico IT nella gestione di reti LAN, diagnostica hardware e software, e installazione di sistemi CCTV."
+          },
+          {
+            q: "Quali certificazioni possiedi?",
+            a: "Possiedo le certificazioni ufficiali CompTIA A+, Cisco Certified Network Associate (CCNA) e una certificazione in Full Stack Web Development.",
+            voice: "Possiedo le certificazioni CompTIA A plus, Cisco CCNA e sviluppo web full stack."
+          },
+          {
+            q: "Quali lingue parli?",
+            a: "Parlo Bengali madrelingua, Inglese a livello intermedio B2 e Italiano a livello base A2, attualmente residente a Cagliari in Sardegna.",
+            voice: "Parlo bengalese, inglese livello B2 e italiano base A2, vivo a Cagliari."
+          },
+          {
+            q: "Quali competenze hai nel web?",
+            a: "Conosco HTML, CSS, framework Bootstrap e la piattaforma WordPress per creare e mantenere siti web moderni e funzionali.",
+            voice: "Sviluppo siti web con HTML, CSS, Bootstrap e WordPress."
+          },
+          {
+            q: "Come posso contattarti per un colloquio?",
+            a: "Puoi contattarmi telefonicamente al numero +39 3500 946931 oppure via email a eyasinitaly@gmail.com.",
+            voice: "Puoi chiamarmi al 3500 946931 o scrivermi a eyasinitaly chiocciola gmail punto com."
+          }
+        ]
+      },
+      EN: {
+        gateSub: "The terminal awaits. Turn on the sound for the best cinematic experience.",
+        enterBtn: "ENTER EXPERIENCE",
+        badge: "CAGLIARI, SARDINIA, ITALY",
+        role: "IT TECHNICIAN | NETWORKING & CCTV | WEB DEV",
+        profile: "IT Support Technician with hands-on experience in hardware/software diagnostics, networking, CCTV surveillance, and modern web interfaces. Ready to contribute in demanding environments.",
+        askTitle: "ASK THE IT SPECIALIST",
+        askSub: "Click any question below — hear Dipu's synthesized voice & insights instantly.",
+        questions: [
+          {
+            q: "What is your core IT experience?",
+            a: "I served as an IT Technician at Big Boss and Quality Assurance Executive at Tekarsh LLC, handling LAN/WAN setups, PC repair, and CCTV surveillance.",
+            voice: "I have hands-on experience in IT Support, LAN and WAN configuration, hardware repair, and CCTV surveillance systems."
+          },
+          {
+            q: "Which certifications do you hold?",
+            a: "I hold accredited certifications in CompTIA A+, Cisco Certified Network Associate (CCNA), and Full Stack Web Development.",
+            voice: "I am certified in CompTIA A plus, Cisco CCNA, and Full Stack Web Development."
+          },
+          {
+            q: "What languages do you speak?",
+            a: "Bengali (Native), English (B2 Intermediate), and Italian (A2 Basic), currently based in Cagliari, Sardinia, Italy.",
+            voice: "I speak Bengali, English at B2 level, and Italian at A2 level."
+          },
+          {
+            q: "What are your web development skills?",
+            a: "Proficient in HTML5, CSS3, Bootstrap, and WordPress deployment for modern responsive web applications.",
+            voice: "I build responsive web solutions using HTML, CSS, Bootstrap, and WordPress."
+          },
+          {
+            q: "How can we schedule an interview?",
+            a: "You can reach me directly by phone at +39 3500 946931 or via email at eyasinitaly@gmail.com.",
+            voice: "You can reach me at +39 3500 946931 or email eyasinitaly@gmail.com."
+          }
+        ]
+      }
+    };
+
+    // -------------------------------------------------------------
+    // WEB AUDIO API - SYNTHESIZER (No external audio file dependencies!)
+    // -------------------------------------------------------------
+    let audioCtx = null;
+    let ambientDroneGain = null;
+
+    function initAudioEngine() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      playAmbientDrone();
+    }
+
+    function playAmbientDrone() {
+      if (!audioCtx || !soundEnabled) return;
+      try {
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const filter = audioCtx.createBiquadFilter();
+        ambientDroneGain = audioCtx.createGain();
+
+        osc1.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(55, audioCtx.currentTime); // A1 note
+
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(110, audioCtx.currentTime); // A2 harmonic
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(260, audioCtx.currentTime);
+
+        ambientDroneGain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+
+        osc1.connect(filter);
+        osc2.connect(filter);
+        filter.connect(ambientDroneGain);
+        ambientDroneGain.connect(audioCtx.destination);
+
+        osc1.start();
+        osc2.start();
+      } catch (e) {
+        console.warn("Ambient audio error:", e);
+      }
+    }
+
+    function playBeep(freq = 600, duration = 0.15) {
+      if (!audioCtx || !soundEnabled) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Voice Synthesis for "Ask Dipu"
+    function speakAnswer(text) {
+      if (!soundEnabled) return;
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel(); // stop current speech
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = currentLang === 'IT' ? 'it-IT' : 'en-US';
+        utterance.rate = 1.0;
+        utterance.pitch = 0.95; // slightly deeper, confident tone
+
+        const wave = document.getElementById('audio-wave-anim');
+        utterance.onstart = () => {
+          if (wave) wave.style.opacity = '1';
+        };
+        utterance.onend = () => {
+          if (wave) wave.style.opacity = '0.3';
+        };
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // PROCEDURAL STORM & LIGHTNING CANVAS
+    // -------------------------------------------------------------
+    const canvas = document.getElementById('storm-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resizeCanvas() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class LightningParticle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedY = Math.random() * 1.5 + 0.2;
+        this.speedX = (Math.random() - 0.5) * 0.8;
+        this.opacity = Math.random() * 0.7 + 0.2;
+      }
+      update() {
+        this.y += this.speedY;
+        this.x += this.speedX;
+        if (this.y > height || this.x < 0 || this.x > width) {
+          this.reset();
+          this.y = 0;
+        }
+      }
+      draw() {
+        ctx.fillStyle = `rgba(0, 255, 200, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    const particles = Array.from({ length: 90 }, () => new LightningParticle());
+
+    let flashTimer = 0;
+    function renderStorm() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Random lightning flash
+      flashTimer++;
+      if (flashTimer > 280 && Math.random() > 0.97) {
+        ctx.fillStyle = 'rgba(0, 255, 200, 0.08)';
+        ctx.fillRect(0, 0, width, height);
+        playBeep(180, 0.08); // electric rumble
+        flashTimer = 0;
+      }
+
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      requestAnimationFrame(renderStorm);
+    }
+    renderStorm();
+
+    // -------------------------------------------------------------
+    // QUESTIONS TERMINAL SETUP
+    // -------------------------------------------------------------
+    function renderQuestions() {
+      const container = document.getElementById('questions-container');
+      const langData = dataCV[currentLang];
+      container.innerHTML = '';
+
+      langData.questions.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.className = `ask-btn ${index === 0 ? 'active' : ''}`;
+        btn.innerHTML = `
+          <span><strong style="color: var(--neon-cyan); margin-right: 8px;">0${index+1} //</strong> ${item.q}</span>
+          <i class="fa-solid fa-play play-badge"></i>
+        `;
+
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.ask-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          playBeep(880, 0.09);
+
+          // Update Display
+          document.getElementById('console-query-status').innerText = `EXECUTING QUERY [0${index+1}]`;
+          const display = document.getElementById('console-display');
+          display.style.opacity = '0';
+          
+          setTimeout(() => {
+            display.innerText = item.a;
+            display.style.opacity = '1';
+            speakAnswer(item.voice);
+          }, 150);
+        });
+
+        container.appendChild(btn);
+      });
+
+      // Load initial first answer
+      if (langData.questions[0]) {
+        document.getElementById('console-display').innerText = langData.questions[0].a;
+      }
+    }
+
+    // -------------------------------------------------------------
+    // LANGUAGE SWITCHING LOGIC
+    // -------------------------------------------------------------
+    function applyLanguage(lang) {
+      currentLang = lang;
+      const dict = dataCV[lang];
+
+      document.getElementById('lang-indicator').innerText = lang;
+      document.getElementById('gate-sub-text').innerText = dict.gateSub;
+      document.getElementById('enter-btn-text').innerText = dict.enterBtn;
+      document.getElementById('hero-badge-text').innerHTML = `<i class="fa-solid fa-satellite-dish"></i> ${dict.badge}`;
+      document.getElementById('hero-role-title').innerText = dict.role;
+      document.getElementById('hero-profile-text').innerText = dict.profile;
+      document.getElementById('ask-sub').innerText = dict.askSub;
+
+      renderQuestions();
+    }
+
+    // Toggle Language
+    document.getElementById('lang-toggle-btn').addEventListener('click', () => {
+      playBeep(1200, 0.05);
+      const nextLang = currentLang === 'IT' ? 'EN' : 'IT';
+      applyLanguage(nextLang);
+    });
+
+    // Toggle Audio Button
+    const audioBtn = document.getElementById('audio-toggle-btn');
+    audioBtn.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      if (soundEnabled) {
+        initAudioEngine();
+        audioBtn.classList.remove('active-audio');
+        document.getElementById('audio-status-label').innerText = 'AUDIO: ON';
+      } else {
+        if (ambientDroneGain && audioCtx) {
+          ambientDroneGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        }
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        audioBtn.classList.add('active-audio');
+        document.getElementById('audio-status-label').innerText = 'AUDIO: MUTED';
+      }
+    });
+
+    // Gatekeeper Enter Button
+    document.getElementById('enter-portal-btn').addEventListener('click', () => {
+      initAudioEngine();
+      playBeep(920, 0.2);
+
+      // Trigger Confetti Celebration
+      confetti({
+        particleCount: 70,
+        spread: 90,
+        origin: { y: 0.6 },
+        colors: ['#00ffc8', '#ff3344', '#ffffff']
+      });
+
+      // Hide Modal with GSAP
+      gsap.to('#gatekeeper-modal', {
+        opacity: 0,
+        scale: 0.95,
+        duration: 0.8,
+        ease: 'power3.inOut',
+        onComplete: () => {
+          document.getElementById('gatekeeper-modal').style.display = 'none';
+        }
+      });
+
+      // Animate Hero Entrance
+      gsap.from('.hero-title', { y: 60, opacity: 0, duration: 1.2, delay: 0.2 });
+      gsap.from('.portrait-stage', { scale: 0.8, opacity: 0, duration: 1.2, delay: 0.1 });
+    });
+
+    // Initialize View
+    applyLanguage('IT');
+
+    // Register ScrollTrigger Animations
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.utils.toArray('.skill-card').forEach((card, i) => {
+        gsap.from(card, {
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 85%',
+          },
+          opacity: 0,
+          y: 40,
+          duration: 0.8,
+          delay: (i % 3) * 0.15
+        });
+      });
+    }
+  </script>
+</body>
+</html>
+```eof
+
+### আপনার ওয়েবসাইটের বিশেষ ফিচারগুলো:
+1. **সিনেমেটিক এন্ট্রি স্ক্রিন (Digital Dropouts ইন্সপায়ার্ড):** ভিডিওতে যেমন একটি লোডিং অ্যানিমেশন ও "Turn on the sound" বাটন থাকে, ঠিক তেমন একটি ইন্টারেক্টিভ লোডার ও এন্টার বাটন যোগ করা হয়েছে।
+2. **সাউন্ড সিস্টেম ও ভয়েসওভার:** কোনো অতিরিক্ত অডিও ফাইল ছাড়াই ব্রাউজারের আধুনিক **Web Audio API** দিয়ে লো-ফ্রিকোয়েন্সি সাইবার ড্রোন ও বাটন সাউন্ড ইফেক্ট তৈরি করা হয়েছে। আর প্রশ্নোত্তর অংশে **Speech Synthesis Engine** আপনার প্রশ্নের উত্তর বাংলায়/ইতালিয়ান/ইংরেজিতে পড়ে শোনাবে।
+3. **"Ask The IT Specialist" রাডার কনসোল:** ভিডিওর "Ask the Baba" সেকশনের হুবহু ধাঁচে ডিজাইন করা হয়েছে। বাম পাশে রাডার ও ক্লিকের প্রশ্ন এবং ডান পাশে সাইবার টার্মিনাল ডিসপ্লে ও অডিও ওয়েব অ্যানিমেশন।
+4. **সিভি ডেটার সঠিক উপস্থাপন:** আপনার সিভির প্রতিটি গুরুত্বপূর্ণ তথ্য (CompTIA A+, CCNA, IT Support, Big Boss, Tekarsh LLC, Sonargaon University, ক্যাগলিয়ারি ইতালির ফোন ও ইমেইল) এতে সুন্দরভাবে সাজানো।
+5. **দ্বিভাষিক সুইচ (Italian & English):** উপরে একটি বাটন রয়েছে যার মাধ্যমে এক ক্লিকেই সম্পূর্ণ প্রোফাইল ইতালিয়ান এবং ইংরেজিতে পরিবর্তিত হয়ে যাবে।
+
+### অনলাইনে লাইভ দেখতে কী করবেন?
+1. কোডটি কপি করে আপনার কম্পিউটারে একটি ফাইলে সেভ করুন যার নাম দিন `index.html`।
+2. গিটহাবে একটি নতুন রিপোজিটরি বানিয়ে ফাইলটি আপলোড করুন।
+3. রিপোজিটরির **Settings** > **Pages**-এ গিয়ে `main` ব্রাঞ্চ সিলেক্ট করে **Save** দিন। এক মিনিটের মধ্যে এটি ফ্রি লাইভ হয়ে যাবে।
